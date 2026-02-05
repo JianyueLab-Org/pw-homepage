@@ -2,12 +2,14 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 const route = useRoute();
+const { locale } = useI18n();
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
     label: $t("header.home"),
     to: "/",
-    active: route.path === "/",
+    active:
+      route.path === `/${locale.value}` || route.path === `/${locale.value}/`,
   },
   {
     label: "JianyueLab Org.",
