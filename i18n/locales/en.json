@@ -5,7 +5,7 @@
   "home": {
     "title": "Postal Wiki Search",
     "subtitle": "Search across Chinese and English postal wikis",
-    "placeholder": "Search postal codes, post offices, express mail...",
+    "placeholder": "Search anything you want to know about postal...",
     "selectWiki": "Select wiki to search:",
     "both": "Both",
     "zh": "中文",
