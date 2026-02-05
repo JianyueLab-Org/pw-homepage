@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 useHead({
+  title: "Postal Wiki",
   script: [
     {
       defer: true,
