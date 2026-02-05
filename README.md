@@ -1,11 +1,11 @@
-# Postal Wiki - Homepage
+# Postal Wiki | Homepage
 
 ## Quick Start
 
 ```bash
-# Install dependencies
-bun Install
+# Install Dependencies
+bun install
 
-# Run Dev Preview
+# Run Development Preview
 bun run dev
 ```

@@ -1,0 +1,14 @@
+{
+  "header": {
+    "home": "Home"
+  },
+  "home": {
+    "title": "Postal Wiki Search",
+    "subtitle": "Search across Chinese and English postal wikis",
+    "placeholder": "Search postal codes, post offices, express mail...",
+    "selectWiki": "Select wiki to search:",
+    "both": "Both",
+    "zh": "中文",
+    "en": "English"
+  }
+}

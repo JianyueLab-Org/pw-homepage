@@ -1,0 +1,14 @@
+{
+  "header": {
+    "home": "首页"
+  },
+  "home": {
+    "title": "邮政百科搜索",
+    "subtitle": "搜索中文和英文邮政百科",
+    "placeholder": "搜索邮政编码、邮局、快递...",
+    "selectWiki": "选择要搜索的维基：",
+    "both": "全部",
+    "zh": "中文",
+    "en": "English"
+  }
+}
