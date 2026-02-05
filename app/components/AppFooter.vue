@@ -103,7 +103,7 @@ function selectLocale(localeCode: string) {
         icon="i-simple-icons-discord"
         color="neutral"
         variant="ghost"
-        to="https://go.nuxt.com/discord"
+        to="https://discord.gg/g5bB59fT84"
         target="_blank"
         aria-label="Discord"
       />
@@ -111,7 +111,7 @@ function selectLocale(localeCode: string) {
         icon="i-simple-icons-github"
         color="neutral"
         variant="ghost"
-        to="https://github.com/nuxt/nuxt"
+        to="https://github.com/JianyueLab-org"
         target="_blank"
         aria-label="GitHub"
       />
