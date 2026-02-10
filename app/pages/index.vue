@@ -14,12 +14,20 @@ const wikis = [
 
 const recommendedArticles = [
   {
+    title: "朝鲜邮政",
+    url: "https://zh.postal.wiki/wiki/%E6%9C%9D%E9%B2%9C%E9%82%AE%E6%94%BF",
+  },
+  {
     title: "中国大陆现行邮政相关规章制度的目录列表",
     url: "https://zh.postal.wiki/wiki/%E4%B8%AD%E5%9B%BD%E5%A4%A7%E9%99%86%E7%8E%B0%E8%A1%8C%E9%82%AE%E6%94%BF%E7%9B%B8%E5%85%B3%E8%A7%84%E7%AB%A0%E5%88%B6%E5%BA%A6%E7%9A%84%E7%9B%AE%E5%BD%95%E5%88%97%E8%A1%A8",
   },
   {
-    title: "中国大陆各级邮政相关部门的复函目录列表",
-    url: "https://zh.postal.wiki/wiki/%E4%B8%AD%E5%9B%BD%E5%A4%A7%E9%99%86%E5%90%84%E7%BA%A7%E9%82%AE%E6%94%BF%E7%9B%B8%E5%85%B3%E9%83%A8%E9%97%A8%E7%9A%84%E5%A4%8D%E5%87%BD%E7%9B%AE%E5%BD%95%E5%88%97%E8%A1%A8",
+    title: "推荐性标准 (邮政领域)",
+    url: "https://zh.postal.wiki/wiki/%E6%8E%A8%E8%8D%90%E6%80%A7%E6%A0%87%E5%87%86_(%E9%82%AE%E6%94%BF%E9%A2%86%E5%9F%9F)",
+  },
+  {
+    title: "假邮局",
+    url: "https://zh.postal.wiki/wiki/%E5%81%87%E9%82%AE%E5%B1%80",
   },
 ];
 
