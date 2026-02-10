@@ -10,5 +10,8 @@
     "both": "全部",
     "zh": "中文",
     "en": "English"
+  },
+  "recommended": {
+    "title": "推荐条目"
   }
 }

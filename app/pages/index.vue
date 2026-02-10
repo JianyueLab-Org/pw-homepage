@@ -12,6 +12,17 @@ const wikis = [
   },
 ];
 
+const recommendedArticles = [
+  {
+    title: "中国大陆现行邮政相关规章制度的目录列表",
+    url: "https://zh.postal.wiki/wiki/%E4%B8%AD%E5%9B%BD%E5%A4%A7%E9%99%86%E7%8E%B0%E8%A1%8C%E9%82%AE%E6%94%BF%E7%9B%B8%E5%85%B3%E8%A7%84%E7%AB%A0%E5%88%B6%E5%BA%A6%E7%9A%84%E7%9B%AE%E5%BD%95%E5%88%97%E8%A1%A8",
+  },
+  {
+    title: "中国大陆各级邮政相关部门的复函目录列表",
+    url: "https://zh.postal.wiki/wiki/%E4%B8%AD%E5%9B%BD%E5%A4%A7%E9%99%86%E5%90%84%E7%BA%A7%E9%82%AE%E6%94%BF%E7%9B%B8%E5%85%B3%E9%83%A8%E9%97%A8%E7%9A%84%E5%A4%8D%E5%87%BD%E7%9B%AE%E5%BD%95%E5%88%97%E8%A1%A8",
+  },
+];
+
 const searchQuery = ref("");
 const selectedWiki = ref("zh");
 
@@ -117,6 +128,27 @@ const handleSearch = () => {
           </form>
         </div>
       </UCard>
+
+      <!-- Recommended Articles -->
+      <div class="mt-8">
+        <h2 class="text-lg font-semibold mb-4">
+          {{ $t("recommended.title") }}
+        </h2>
+        <div class="space-y-2">
+          <UButton
+            v-for="article in recommendedArticles"
+            :key="article.url"
+            :to="article.url"
+            target="_blank"
+            variant="ghost"
+            block
+            class="justify-start"
+          >
+            <UIcon name="i-heroicons-document-text" class="mr-2 shrink-0" />
+            {{ article.title }}
+          </UButton>
+        </div>
+      </div>
     </div>
   </div>
 </template>

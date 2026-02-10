@@ -10,5 +10,8 @@
     "both": "Both",
     "zh": "中文",
     "en": "English"
+  },
+  "recommended": {
+    "title": "Recommended Articles"
   }
 }
