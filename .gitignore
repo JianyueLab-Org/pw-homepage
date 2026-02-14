@@ -5,6 +5,7 @@
 .nitro
 .cache
 dist
+bun.lock
 
 # Node dependencies
 node_modules
