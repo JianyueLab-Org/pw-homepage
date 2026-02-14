@@ -16,7 +16,7 @@
     "@nuxt/ui": "4.4.0",
     "@nuxtjs/i18n": "10.2.1",
     "@tailwindcss/vite": "^4.1.18",
-    "eslint": "^9.0.0",
+    "eslint": "^10.0.0",
     "install": "^0.13.0",
     "nuxt": "^4.3.0",
     "tailwindcss": "^4.1.18",
