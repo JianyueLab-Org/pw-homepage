@@ -35,20 +35,95 @@ jobs:
             });
             return String(deployment.data.id);
 
+      # 更新部署状态为进行中
+      - name: Update Deployment Status (In Progress)
+        uses: actions/github-script@v7
+        env:
+          DEPLOYMENT_ID: ${{ steps.deployment.outputs.result }}
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: Number(process.env.DEPLOYMENT_ID),
+              state: "in_progress",
+              environment_url: "https://postal.wiki",
+            });
+
       # 触发 Dokploy 部署
       - name: Trigger Dokploy Deployment
         id: dokploy
+        env:
+          DOKPLOY_BASE_URL: https://app.jianyuelab.org
+          APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
         run: |
-          curl -X "POST" \
-            "https://app.jianyuelab.org/api/application.deploy" \
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail \
+            -X POST \
+            "${DOKPLOY_BASE_URL}/api/application.deploy" \
             -H "accept: application/json" \
-            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            -H "x-api-key: ${DOKPLOY_API_KEY}" \
             -H "Content-Type: application/json" \
-            -d '{ "applicationId": "${{ secrets.APPLICATION_ID }}" }'
+            -d "{\"applicationId\":\"${APPLICATION_ID}\"}")"
+
+          echo "Dokploy deploy trigger response:"
+          echo "${response}"
+
+      # 轮询 Dokploy 部署状态
+      - name: Wait for Dokploy Deployment
+        id: dokploy_status
+        env:
+          DOKPLOY_BASE_URL: https://app.jianyuelab.org
+          APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          MAX_ATTEMPTS: "40"
+          SLEEP_SECONDS: "15"
+        run: |
+          set -euo pipefail
+
+          state=""
+          for attempt in $(seq 1 "${MAX_ATTEMPTS}"); do
+            response="$(curl --silent --show-error --fail \
+              -X GET \
+              "${DOKPLOY_BASE_URL}/api/application.one?applicationId=${APPLICATION_ID}" \
+              -H "accept: application/json" \
+              -H "x-api-key: ${DOKPLOY_API_KEY}")"
+
+            state="$(node -e '
+              const raw = process.argv[1];
+              try {
+                const data = JSON.parse(raw);
+                const value = data?.applicationStatus ?? data?.status ?? data?.state ?? "";
+                process.stdout.write(String(value));
+              } catch {
+                process.stdout.write("");
+              }
+            ' "${response}")"
+
+            echo "Attempt ${attempt}/${MAX_ATTEMPTS} - Dokploy state: ${state:-unknown}"
+            echo "Raw response: ${response}"
+
+            if [ "${state}" = "done" ]; then
+              echo "dokploy_state=done" >> "${GITHUB_OUTPUT}"
+              exit 0
+            fi
+
+            if [ "${state}" = "error" ]; then
+              echo "dokploy_state=error" >> "${GITHUB_OUTPUT}"
+              exit 1
+            fi
+
+            sleep "${SLEEP_SECONDS}"
+          done
+
+          echo "Dokploy deployment timed out"
+          echo "dokploy_state=timeout" >> "${GITHUB_OUTPUT}"
+          exit 1
 
       # 更新部署状态为成功
       - name: Update Deployment Status
-        if: success()
+        if: ${{ success() && steps.dokploy_status.outputs.dokploy_state == 'done' }}
         uses: actions/github-script@v7
         env:
           DEPLOYMENT_ID: ${{ steps.deployment.outputs.result }}
