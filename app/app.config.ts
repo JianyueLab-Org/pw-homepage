@@ -1,7 +1,7 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: "amber",
+      primary: "blue",
       neutral: "neutral",
     },
     card: {
