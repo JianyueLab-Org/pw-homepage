@@ -1,18 +1,44 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+type Wiki = {
+  id: "zh" | "en";
+  name: string;
+  url: string;
+  flag: string;
+};
+
+type RecommendedArticle = {
+  title: string;
+  url: string;
+  lang: "zh-cn" | "en";
+};
+
+type SearchResult = {
+  wiki: Wiki;
+  url: string;
+};
+
 const { t, locale } = useI18n();
 
-const wikis = [
-  { id: "zh", name: "简体中文", url: "https://zh.postal.wiki", flag: "🇨🇳" },
-  {
-    id: "en",
-    name: "English",
-    url: "https://en.postal.wiki",
-    flag: "🇬🇧",
-  },
-];
+const zhWiki: Wiki = {
+  id: "zh",
+  name: "简体中文",
+  url: "https://zh.postal.wiki",
+  flag: "🇨🇳",
+};
 
-const recommendedArticles = [
+const enWiki: Wiki = {
+  id: "en",
+  name: "English",
+  url: "https://en.postal.wiki",
+  flag: "🇬🇧",
+};
+
+const wikis: Wiki[] = [zhWiki, enWiki];
+
+const recommendedArticles: RecommendedArticle[] = [
   {
     title: "朝鲜邮政",
     url: "https://zh.postal.wiki/wiki/%E6%9C%9D%E9%B2%9C%E9%82%AE%E6%94%BF",
@@ -56,8 +82,14 @@ const recommendedArticles = [
   },
 ];
 
+const normalizedLocale = computed(() => locale.value.toLowerCase());
+
 const filteredArticles = computed(() =>
-  recommendedArticles.filter((article) => article.lang === locale.value)
+  recommendedArticles.filter((article) =>
+    article.lang === "zh-cn"
+      ? normalizedLocale.value.startsWith("zh")
+      : normalizedLocale.value.startsWith("en")
+  )
 );
 
 const searchQuery = ref("");
@@ -67,18 +99,18 @@ const searchUrls = computed(() => {
   if (!searchQuery.value.trim()) return [];
 
   const encodedQuery = encodeURIComponent(searchQuery.value);
-  const results = [];
+  const results: SearchResult[] = [];
 
   if (selectedWiki.value === "zh") {
     results.push({
-      wiki: wikis[0],
+      wiki: zhWiki,
       url: `https://zh.postal.wiki/index.php?search=${encodedQuery}&title=Special:Search&fulltext=1`,
     });
   }
 
   if (selectedWiki.value === "en") {
     results.push({
-      wiki: wikis[1],
+      wiki: enWiki,
       url: `https://en.postal.wiki/index.php?search=${encodedQuery}&title=Special:Search&fulltext=1`,
     });
   }
@@ -103,10 +135,10 @@ const handleSearch = () => {
       <!-- Header -->
       <div class="text-center mb-12">
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
-          {{ $t("home.title") }}
+          {{ t("home.title") }}
         </h1>
         <p class="text-gray-500 dark:text-gray-400">
-          {{ $t("home.subtitle") }}
+          {{ t("home.subtitle") }}
         </p>
       </div>
 
@@ -130,19 +162,19 @@ const handleSearch = () => {
         <div class="space-y-6">
           <!-- Wiki Selection -->
           <div>
-            <p class="text-sm font-medium mb-3">{{ $t("home.selectWiki") }}</p>
+            <p class="text-sm font-medium mb-3">{{ t("home.selectWiki") }}</p>
             <div class="flex gap-2">
               <UButton
                 :variant="selectedWiki === 'zh' ? 'solid' : 'outline'"
                 @click="selectedWiki = 'zh'"
               >
-                {{ $t("home.zh") }}
+                {{ t("home.zh") }}
               </UButton>
               <UButton
                 :variant="selectedWiki === 'en' ? 'solid' : 'outline'"
                 @click="selectedWiki = 'en'"
               >
-                {{ $t("home.en") }}
+                {{ t("home.en") }}
               </UButton>
             </div>
           </div>
@@ -152,7 +184,7 @@ const handleSearch = () => {
             <UInput
               v-model="searchQuery"
               size="xl"
-              :placeholder="$t('home.placeholder')"
+              :placeholder="t('home.placeholder')"
               autofocus
               class="flex-1"
             />
@@ -169,7 +201,7 @@ const handleSearch = () => {
       <!-- Recommended Articles -->
       <div class="mt-8">
         <h2 class="text-lg font-semibold mb-4">
-          {{ $t("recommended.title") }}
+          {{ t("recommended.title") }}
         </h2>
         <div class="space-y-2">
           <UButton
