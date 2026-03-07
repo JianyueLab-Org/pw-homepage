@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@nuxt/eslint": "1.13.0",
-    "@nuxt/ui": "4.4.0",
+    "@nuxt/ui": "4.5.1",
     "@nuxtjs/i18n": "10.2.1",
     "@tailwindcss/vite": "^4.1.18",
     "eslint": "^9.0.0",
