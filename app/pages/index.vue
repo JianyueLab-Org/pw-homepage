@@ -88,8 +88,8 @@ const filteredArticles = computed(() =>
   recommendedArticles.filter((article) =>
     article.lang === "zh-cn"
       ? normalizedLocale.value.startsWith("zh")
-      : normalizedLocale.value.startsWith("en")
-  )
+      : normalizedLocale.value.startsWith("en"),
+  ),
 );
 
 const searchQuery = ref("");
