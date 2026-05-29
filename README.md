@@ -16,13 +16,13 @@ bun run dev
 
 ## Scripts
 
-| Command            | Action                                       |
-| ------------------ | -------------------------------------------- |
-| `bun run dev`      | Start the local dev server                   |
-| `bun run build`    | Build the static site to `dist/`             |
-| `bun run preview`  | Preview the production build locally         |
-| `bun run check`    | Type-check the project (`astro check`)       |
-| `bun run lint`     | Lint with ESLint                             |
+| Command           | Action                                 |
+| ----------------- | -------------------------------------- |
+| `bun run dev`     | Start the local dev server             |
+| `bun run build`   | Build the static site to `dist/`       |
+| `bun run preview` | Preview the production build locally   |
+| `bun run check`   | Type-check the project (`astro check`) |
+| `bun run lint`    | Lint with ESLint                       |
 
 ## Localization
 
