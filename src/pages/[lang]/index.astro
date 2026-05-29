@@ -1,0 +1,72 @@
+---
+import Base from "../../layouts/Base.astro";
+import SearchCard from "../../components/SearchCard.astro";
+import ArticleList from "../../components/ArticleList.astro";
+import { locales, useTranslations, type Lang } from "../../i18n/ui";
+import { wikis } from "../../data";
+
+export function getStaticPaths() {
+  return locales.map((l) => ({ params: { lang: l.code } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+---
+
+<Base lang={lang} title={`${t("home.title")} | Postal Wiki`} description={t("home.subtitle")}>
+  <!-- Ambient background glow -->
+  <div
+    class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-120 overflow-hidden"
+    aria-hidden="true"
+  >
+    <div
+      class="absolute left-1/2 -top-30 h-105 w-170 max-w-[120vw] -translate-x-1/2 rounded-full bg-linear-to-br from-primary-300/40 via-sky-200/30 to-transparent blur-3xl dark:from-primary-600/25 dark:via-sky-700/15"
+    >
+    </div>
+  </div>
+
+  <div class="container relative mx-auto px-4 py-16 md:py-24">
+    <div class="mx-auto max-w-2xl">
+      <!-- Header -->
+      <div class="mb-12 text-center">
+        <h1
+          class="reveal reveal-1 mb-3 bg-linear-to-br from-neutral-900 via-primary-700 to-primary-500 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent md:text-5xl dark:from-white dark:via-primary-200 dark:to-primary-400"
+        >
+          {t("home.title")}
+        </h1>
+        <p class="reveal reveal-2 text-base text-neutral-500 md:text-lg dark:text-neutral-400">
+          {t("home.subtitle")}
+        </p>
+      </div>
+
+      <!-- Wiki Links -->
+      <div class="reveal reveal-2 mb-8 flex flex-wrap justify-center gap-4">
+        {
+          wikis.map((wiki) => (
+            <a
+              href={wiki.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-5 py-2.5 text-base font-medium text-primary-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-100 hover:shadow-md active:translate-y-0 dark:border-primary-900/60 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950/70"
+            >
+              <span class="text-xl transition-transform duration-300 group-hover:scale-125">
+                {wiki.flag}
+              </span>
+              {wiki.name}
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- Search Box -->
+      <div class="reveal reveal-3">
+        <SearchCard lang={lang} />
+      </div>
+
+      <!-- Recommended Articles -->
+      <div class="reveal reveal-4">
+        <ArticleList lang={lang} />
+      </div>
+    </div>
+  </div>
+</Base>

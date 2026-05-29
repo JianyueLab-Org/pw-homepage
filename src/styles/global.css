@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/* Class-based dark mode: toggled by adding `dark` to <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Semantic palette — primary = blue, surfaces driven by neutral.
+   Aliased so components can use `bg-primary-600`, `text-primary-500`, etc. */
+@theme {
+  --color-primary-50: var(--color-blue-50);
+  --color-primary-100: var(--color-blue-100);
+  --color-primary-200: var(--color-blue-200);
+  --color-primary-300: var(--color-blue-300);
+  --color-primary-400: var(--color-blue-400);
+  --color-primary-500: var(--color-blue-500);
+  --color-primary-600: var(--color-blue-600);
+  --color-primary-700: var(--color-blue-700);
+  --color-primary-800: var(--color-blue-800);
+  --color-primary-900: var(--color-blue-900);
+  --color-primary-950: var(--color-blue-950);
+
+  /* Entrance animations */
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.6s ease both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-neutral-900 antialiased;
+}
+
+.dark body {
+  @apply bg-neutral-950 text-neutral-100;
+}
+
+/* Smooth color crossfade between themes (fallback for browsers without the
+   View Transitions API; also smooths surfaces the circular reveal doesn't cover). */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  header,
+  footer,
+  .theme-surface {
+    transition:
+      background-color 0.4s ease,
+      border-color 0.4s ease,
+      color 0.4s ease;
+  }
+}
+
+/* Theme switch: circular reveal driven by ThemeToggle.astro.
+   Disable the default cross-fade so our clip-path animation is the only effect. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+/* Keep the incoming (new theme) layer on top so the reveal expands over the old one. */
+::view-transition-new(root) {
+  z-index: 1;
+}
+::view-transition-old(root) {
+  z-index: 0;
+}
+
+/* Staggered entrance helpers — apply with .reveal + .reveal-{n}. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    animation: var(--animate-fade-up);
+  }
+  .reveal-1 {
+    animation-delay: 0.05s;
+  }
+  .reveal-2 {
+    animation-delay: 0.15s;
+  }
+  .reveal-3 {
+    animation-delay: 0.25s;
+  }
+  .reveal-4 {
+    animation-delay: 0.35s;
+  }
+  .reveal-5 {
+    animation-delay: 0.45s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

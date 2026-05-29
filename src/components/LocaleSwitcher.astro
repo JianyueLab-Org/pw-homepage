@@ -1,0 +1,62 @@
+---
+import { locales, type Lang } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+// Path within the current locale (without the /en or /zh-cn prefix), so we can
+// link to the same page in another locale.
+const rest = Astro.url.pathname.replace(/^\/(en|zh-cn)/, "") || "/";
+const current = locales.find((l) => l.code === lang) ?? locales[0];
+---
+
+<details class="group relative">
+  <summary
+    class="flex cursor-pointer list-none items-center gap-2 rounded-md bg-neutral-100 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+  >
+    <span>{current.name}</span>
+    <svg
+      class="h-4 w-4 transition-transform group-open:rotate-180"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </summary>
+
+  <div
+    class="absolute bottom-full right-0 z-50 mb-2 min-w-[120px] overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+  >
+    {
+      locales.map((l) => (
+        <a
+          href={`/${l.code}${rest}`}
+          class:list={[
+            "block px-4 py-2 text-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700",
+            l.code === lang && "font-semibold text-primary-600 dark:text-primary-400",
+          ]}
+        >
+          {l.name}
+        </a>
+      ))
+    }
+  </div>
+</details>
+
+<script>
+  // Close the dropdown when clicking outside of it.
+  document.addEventListener("click", (e) => {
+    document.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((d) => {
+      if (!d.contains(e.target as Node)) d.removeAttribute("open");
+    });
+  });
+</script>

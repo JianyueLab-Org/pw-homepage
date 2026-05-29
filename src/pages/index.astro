@@ -1,0 +1,28 @@
+---
+// Root entry: instantly redirect to a locale. Static-friendly (meta-refresh +
+// canonical for crawlers/no-JS), with a tiny script that prefers the visitor's
+// browser language (zh -> /zh-cn/, otherwise the default /en/).
+const fallback = "/en/";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${fallback}`} />
+    <link rel="canonical" href="https://postal.wiki/en/" />
+    <meta name="robots" content="noindex" />
+    <title>Postal Wiki</title>
+    <script is:inline>
+      (() => {
+        const target = (navigator.language || "").toLowerCase().startsWith("zh")
+          ? "/zh-cn/"
+          : "/en/";
+        location.replace(target);
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="/en/">Continue to Postal Wiki</a>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+---
+import { useTranslations, type Lang } from "../i18n/ui";
+import { articlesForLang } from "../data";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const articles = articlesForLang(lang);
+---
+
+<section class="mt-8">
+  <h2 class="mb-4 text-lg font-semibold">{t("recommended.title")}</h2>
+  <div class="space-y-2">
+    {
+      articles.map((article) => (
+        <a
+          href={article.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-neutral-700 transition-all duration-200 hover:translate-x-1 hover:bg-neutral-100 hover:text-primary-700 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-primary-300"
+        >
+          <svg
+            class="h-5 w-5 shrink-0 text-neutral-400 transition-colors duration-200 group-hover:text-primary-500"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+          </svg>
+          <span>{article.title}</span>
+        </a>
+      ))
+    }
+  </div>
+</section>

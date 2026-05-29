@@ -1,0 +1,73 @@
+---
+import { useTranslations, type Lang } from "../i18n/ui";
+import { zhWiki, enWiki } from "../data";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// The search target follows the page locale: Chinese page -> Chinese wiki,
+// English page -> English wiki.
+const wiki = lang === "zh-cn" ? zhWiki : enWiki;
+---
+
+<div
+  class="theme-surface rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
+>
+  <form id="search-form" class="flex gap-2" data-search-url={wiki.url}>
+    <input
+      id="search-input"
+      type="text"
+      autofocus
+      placeholder={t("home.placeholder")}
+      class="flex-1 rounded-md border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 transition-all duration-200 placeholder:text-neutral-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
+    />
+    <button
+      id="search-submit"
+      type="submit"
+      disabled
+      aria-label="Search"
+      class="inline-flex items-center justify-center rounded-md bg-primary-600 px-4 py-3 text-white transition-all duration-200 hover:bg-primary-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+    >
+      <svg
+        class="h-5 w-5"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </svg>
+    </button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById("search-form") as HTMLFormElement | null;
+  const input = document.getElementById("search-input") as HTMLInputElement | null;
+  const submit = document.getElementById("search-submit") as HTMLButtonElement | null;
+
+  function syncSubmit() {
+    if (submit && input) submit.disabled = input.value.trim().length === 0;
+  }
+  input?.addEventListener("input", syncSubmit);
+  syncSubmit();
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const query = input?.value.trim();
+    const base = form.dataset.searchUrl;
+    if (!query || !base) return;
+    window.location.href = `${base}/index.php?search=${encodeURIComponent(
+      query,
+    )}&title=Special:Search&fulltext=1`;
+  });
+</script>

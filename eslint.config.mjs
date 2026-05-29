@@ -1,5 +1,18 @@
 // @ts-check
-import withNuxt from "./.nuxt/eslint.config.mjs";
+import eslintPluginAstro from "eslint-plugin-astro";
+import tsParser from "@typescript-eslint/parser";
 
-export default withNuxt();
-// Your custom configs here
+export default [
+  ...eslintPluginAstro.configs.recommended,
+  {
+    files: ["**/*.astro"],
+    languageOptions: {
+      parserOptions: {
+        parser: tsParser,
+      },
+    },
+  },
+  {
+    ignores: ["dist/", ".astro/", "node_modules/"],
+  },
+];

@@ -1,0 +1,112 @@
+---
+import Logo from "./Logo.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+import { useTranslations, type Lang } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const currentPath = Astro.url.pathname.replace(/\/$/, "");
+const homePath = `/${lang}`;
+
+const items = [
+  { label: t("header.home"), href: `${homePath}/`, active: currentPath === homePath, external: false },
+  { label: "JianyueLab Org.", href: "https://jianyuelab.org", active: false, external: true },
+];
+
+const linkBase =
+  "text-sm font-medium transition-colors hover:text-primary-600 dark:hover:text-primary-400";
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80"
+>
+  <div
+    class="container mx-auto flex h-16 items-center justify-between gap-4 px-4"
+  >
+    <Logo lang={lang} />
+
+    <!-- Desktop nav -->
+    <nav class="hidden items-center gap-6 md:flex">
+      {
+        items.map((item) => (
+          <a
+            href={item.href}
+            class:list={[
+              linkBase,
+              item.active
+                ? "text-primary-600 dark:text-primary-400"
+                : "text-neutral-600 dark:text-neutral-300",
+            ]}
+            {...item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-1">
+      <ThemeToggle />
+
+      <!-- Mobile menu button -->
+      <button
+        id="menu-toggle"
+        type="button"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        class="inline-flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800 md:hidden"
+      >
+        <svg
+          class="h-5 w-5"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile nav -->
+  <nav
+    id="mobile-nav"
+    class="hidden border-t border-neutral-200 px-4 py-2 dark:border-neutral-800 md:hidden"
+  >
+    {
+      items.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            "block rounded-md px-2 py-2 text-sm font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800",
+            item.active
+              ? "text-primary-600 dark:text-primary-400"
+              : "text-neutral-700 dark:text-neutral-200",
+          ]}
+          {...item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById("menu-toggle");
+  const nav = document.getElementById("mobile-nav");
+  btn?.addEventListener("click", () => {
+    const open = nav?.classList.toggle("hidden") === false;
+    btn.setAttribute("aria-expanded", String(open));
+  });
+</script>

@@ -1,0 +1,13 @@
+---
+import type { Lang } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<a href={`/${lang}/`} class="flex items-center gap-2">
+  <img src="/logo.png" alt="JianyueLab Logo" class="h-6 w-auto" />
+</a>
