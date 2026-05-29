@@ -21,8 +21,9 @@ bun run dev
 | `bun run dev`     | Start the local dev server             |
 | `bun run build`   | Build the static site to `dist/`       |
 | `bun run preview` | Preview the production build locally   |
-| `bun run check`   | Type-check the project (`astro check`) |
-| `bun run lint`    | Lint with ESLint                       |
+| `bun run check`     | Type-check the project (`astro check`) |
+| `bun run typecheck` | Alias of `check` (used by CI)          |
+| `bun run lint`      | Lint with ESLint                       |
 
 ## Localization
 
