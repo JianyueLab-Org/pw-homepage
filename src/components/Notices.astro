@@ -1,0 +1,38 @@
+---
+import { useTranslations, type Lang } from "../i18n/ui";
+import { contentForLang, pageUrl, wikiForLang } from "../data";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const wiki = wikiForLang(lang);
+const { notices } = contentForLang(lang);
+---
+
+<!-- The wiki's own notices, as a counter slip: items torn apart along
+     perforated rules. -->
+<section
+  class="mt-8 grid gap-x-8 gap-y-3 border-y border-rule py-5 sm:grid-cols-[10rem_1fr]"
+  aria-labelledby="notices-title"
+>
+  <h2
+    id="notices-title"
+    class="text-xs font-bold uppercase tracking-[0.14em] text-vermilion [font-stretch:85%] sm:pt-0.5"
+  >
+    {t("notices.title")}
+  </h2>
+  <ul class="divide-y-[2px] divide-dotted divide-rule">
+    {
+      notices.map((notice) => (
+        <li class="py-2 text-sm leading-relaxed text-ink first:pt-0 last:pb-0">
+          {/* Kept on one line: whitespace around the link would render as a
+              visible space inside Chinese text. */}
+          {notice.before}<a href={pageUrl(wiki, notice.page)} target="_blank" rel="noopener noreferrer" class="focus-ring font-semibold underline decoration-vermilion/60 decoration-2 underline-offset-4 hover:decoration-vermilion">{notice.link}</a>{notice.after}
+        </li>
+      ))
+    }
+  </ul>
+</section>

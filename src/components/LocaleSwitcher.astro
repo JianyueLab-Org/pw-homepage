@@ -13,13 +13,13 @@ const rest = Astro.url.pathname.replace(/^\/(en|zh-cn)/, "") || "/";
 const current = locales.find((l) => l.code === lang) ?? locales[0];
 ---
 
-<details class="group relative">
+<details class="group relative" data-locale-switcher>
   <summary
-    class="flex cursor-pointer list-none items-center gap-2 rounded-md bg-neutral-100 px-3 py-1.5 text-sm transition-colors hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+    class="press focus-ring flex cursor-pointer list-none items-center gap-2 border border-rule bg-leaf px-3 py-2 text-sm font-semibold text-ink hover:border-ink-2"
   >
     <span>{current.name}</span>
     <svg
-      class="h-4 w-4 transition-transform group-open:rotate-180"
+      class="h-4 w-4 transition-transform duration-200 ease-standard group-open:rotate-180"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       fill="none"
@@ -33,16 +33,23 @@ const current = locales.find((l) => l.code === lang) ?? locales[0];
     </svg>
   </summary>
 
+  <!-- Grows out of the control that opened it, and shrinks back into it.
+       `origin-bottom-right` keeps that relationship obvious: the menu opens
+       upward here, so it is anchored to the corner it emerged from. -->
   <div
-    class="absolute bottom-full right-0 z-50 mb-2 min-w-[120px] overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+    data-panel
+    class="absolute right-0 bottom-full z-50 mb-2 min-w-36 origin-bottom-right overflow-hidden border border-rule bg-paper text-paper-ink shadow-lg"
   >
     {
       locales.map((l) => (
         <a
           href={`/${l.code}${rest}`}
+          lang={l.bcp47}
+          hreflang={l.bcp47}
+          aria-current={l.code === lang ? "page" : undefined}
           class:list={[
-            "block px-4 py-2 text-sm transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-700",
-            l.code === lang && "font-semibold text-primary-600 dark:text-primary-400",
+            "press focus-ring block px-4 py-2.5 text-sm [outline-offset:-4px] hover:bg-black/5",
+            l.code === lang && "font-semibold text-vermilion",
           ]}
         >
           {l.name}
@@ -52,11 +59,104 @@ const current = locales.find((l) => l.code === lang) ?? locales[0];
   </div>
 </details>
 
+<style>
+  [data-panel] {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+    transition:
+      opacity 220ms var(--ease-standard),
+      scale 220ms var(--ease-standard),
+      translate 220ms var(--ease-standard);
+  }
+
+  /* Enter: materialize from the trigger. */
+  @starting-style {
+    details[open] > [data-panel] {
+      opacity: 0;
+      scale: 0.95;
+      translate: 0 6px;
+    }
+  }
+
+  /* Exit: the same path and the same curve, just quicker. Leaving should
+     never take as long as arriving. */
+  [data-panel][data-closing] {
+    opacity: 0;
+    scale: 0.95;
+    translate: 0 6px;
+    transition-duration: 160ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-panel] {
+      transition: opacity 150ms ease;
+      scale: 1;
+      translate: 0 0;
+    }
+
+    [data-panel][data-closing] {
+      scale: 1;
+      translate: 0 0;
+    }
+  }
+</style>
+
 <script>
-  // Close the dropdown when clicking outside of it.
+  const CLOSE_MS = 200;
+
+  function closeMenu(details: HTMLDetailsElement) {
+    if (!details.open) return;
+    const panel = details.querySelector<HTMLElement>("[data-panel]");
+
+    if (!panel || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      details.open = false;
+      return;
+    }
+
+    // Already retracting — don't restart the animation.
+    if (panel.hasAttribute("data-closing")) return;
+
+    // Play the exit before the browser tears the panel out of the DOM.
+    panel.setAttribute("data-closing", "");
+    const finish = () => {
+      panel.removeAttribute("data-closing");
+      details.open = false;
+    };
+    panel.addEventListener("transitionend", finish, { once: true });
+    // Belt and braces: if the transition never lands, close anyway.
+    window.setTimeout(() => {
+      if (panel.hasAttribute("data-closing")) {
+        panel.removeEventListener("transitionend", finish);
+        finish();
+      }
+    }, CLOSE_MS);
+  }
+
+  document
+    .querySelectorAll<HTMLDetailsElement>("details[data-locale-switcher]")
+    .forEach((details) => {
+      details.querySelector("summary")?.addEventListener("click", (e) => {
+        // Opening is the browser's job; only closing needs to be animated.
+        if (!details.open) return;
+        e.preventDefault();
+        closeMenu(details);
+      });
+    });
+
+  // Dismiss on an outside click or Escape — never leave the visitor stuck
+  // inside a menu they opened by accident.
   document.addEventListener("click", (e) => {
     document.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((d) => {
-      if (!d.contains(e.target as Node)) d.removeAttribute("open");
+      if (!d.contains(e.target as Node)) closeMenu(d);
+    });
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    document.querySelectorAll<HTMLDetailsElement>("details[open]").forEach((d) => {
+      closeMenu(d);
+      d.querySelector("summary")?.focus();
     });
   });
 </script>

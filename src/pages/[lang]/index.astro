@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import SearchCard from "../../components/SearchCard.astro";
 import ArticleList from "../../components/ArticleList.astro";
+import Notices from "../../components/Notices.astro";
 import { locales, useTranslations, type Lang } from "../../i18n/ui";
 import { wikis } from "../../data";
 
@@ -14,59 +15,85 @@ const t = useTranslations(lang);
 ---
 
 <Base lang={lang} title={`${t("home.title")} | Postal Wiki`} description={t("home.subtitle")}>
-  <!-- Ambient background glow -->
-  <div
-    class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-120 overflow-hidden"
-    aria-hidden="true"
-  >
-    <div
-      class="absolute left-1/2 -top-30 h-105 w-170 max-w-[120vw] -translate-x-1/2 rounded-full bg-linear-to-br from-primary-300/40 via-sky-200/30 to-transparent blur-3xl dark:from-primary-600/25 dark:via-sky-700/15"
+  <div class="mx-auto max-w-5xl px-4 pt-6 pb-16 sm:pt-10 md:pb-24">
+    <!-- Souvenir sheet: an ultramarine field with the title and subtitle as
+         its printed margin inscriptions and the search stamp at its centre. -->
+    <section
+      class="on-sheet relative bg-sheet px-4 pt-7 pb-6 text-on-sheet sm:px-10 sm:pt-10 sm:pb-8 md:px-14"
     >
-    </div>
-  </div>
+      <!-- The sheet's printed frame line. -->
+      <div
+        class="pointer-events-none absolute inset-2.5 border border-sheet-rule sm:inset-3.5"
+        aria-hidden="true"
+      >
+      </div>
 
-  <div class="container relative mx-auto px-4 py-16 md:py-24">
-    <div class="mx-auto max-w-2xl">
-      <!-- Header -->
-      <div class="mb-12 text-center">
+      <div class="relative flex items-baseline justify-between gap-6">
         <h1
-          class="reveal reveal-1 mb-3 bg-linear-to-br from-neutral-900 via-primary-700 to-primary-500 bg-clip-text text-4xl font-extrabold tracking-tight text-transparent md:text-5xl dark:from-white dark:via-primary-200 dark:to-primary-400"
+          class="font-display text-[2.25rem] font-black uppercase leading-none tracking-tight text-balance [font-stretch:72%] sm:text-6xl"
         >
           {t("home.title")}
         </h1>
-        <p class="reveal reveal-2 text-base text-neutral-500 md:text-lg dark:text-neutral-400">
-          {t("home.subtitle")}
+        <p
+          class="hidden shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-on-sheet-2 [font-stretch:85%] md:block"
+        >
+          <span lang="zh-CN">邮政百科</span> · Postal Wiki
         </p>
       </div>
 
-      <!-- Wiki Links -->
-      <div class="reveal reveal-2 mb-8 flex flex-wrap justify-center gap-4">
-        {
-          wikis.map((wiki) => (
-            <a
-              href={wiki.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-5 py-2.5 text-base font-medium text-primary-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-300 hover:bg-primary-100 hover:shadow-md active:translate-y-0 dark:border-primary-900/60 dark:bg-primary-950/40 dark:text-primary-300 dark:hover:bg-primary-950/70"
-            >
-              <span class="text-xl transition-transform duration-300 group-hover:scale-125">
-                {wiki.flag}
-              </span>
-              {wiki.name}
-            </a>
-          ))
-        }
-      </div>
-
-      <!-- Search Box -->
-      <div class="reveal reveal-3">
+      <div class="relative mt-6 sm:mt-8">
         <SearchCard lang={lang} />
       </div>
 
-      <!-- Recommended Articles -->
-      <div class="reveal reveal-4">
-        <ArticleList lang={lang} />
+      <div
+        class="relative mt-6 flex flex-col gap-4 sm:mt-7 sm:flex-row sm:items-end sm:justify-between"
+      >
+        <p class="text-sm text-balance text-on-sheet-2 sm:text-base">
+          {t("home.subtitle")}
+        </p>
+
+        <nav aria-label={t("wikis.label")}>
+          <ul class="flex flex-wrap gap-3">
+            {
+              wikis.map((wiki) => (
+                <li>
+                  <!-- The mask that cuts the perforations would also cut away a
+                       focus outline, so it lives on the inner paper, not here. -->
+                  <a
+                    href={wiki.url}
+                    lang={wiki.bcp47}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mounted press focus-ring group block motion-safe:hover:-translate-y-0.5"
+                  >
+                    <span class="perf perf-sm flex items-center gap-2 bg-paper py-2.5 pr-3.5 pl-4 text-paper-ink">
+                    <span class="text-sm font-semibold">{wiki.name}</span>
+                    <span class="hidden text-xs text-paper-ink-2 tabular-nums min-[25rem]:inline">
+                      {new URL(wiki.url).host}
+                    </span>
+                    <svg
+                      class="h-3.5 w-3.5 shrink-0 text-vermilion transition-translate duration-200 ease-standard motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="square"
+                      aria-hidden="true"
+                    >
+                      <path d="M7 17 17 7M8 7h9v9"></path>
+                    </svg>
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
       </div>
-    </div>
+    </section>
+
+    <Notices lang={lang} />
+    <ArticleList lang={lang} />
   </div>
 </Base>
