@@ -131,7 +131,11 @@ body {
 }
 
 ::selection {
-  background-color: color-mix(in oklab, var(--color-vermilion) 28%, transparent);
+  background-color: color-mix(
+    in oklab,
+    var(--color-vermilion) 28%,
+    transparent
+  );
   color: inherit;
 }
 
@@ -149,10 +153,10 @@ body {
   mask:
     radial-gradient(circle var(--perf-r) at 50% 0, var(--_hole)) top left /
       var(--perf-p) 100% round no-repeat,
-    radial-gradient(circle var(--perf-r) at 50% 100%, var(--_hole)) bottom left /
-      var(--perf-p) 100% round no-repeat,
-    radial-gradient(circle var(--perf-r) at 0 50%, var(--_hole)) top left /
-      100% var(--perf-p) no-repeat round,
+    radial-gradient(circle var(--perf-r) at 50% 100%, var(--_hole)) bottom
+      left / var(--perf-p) 100% round no-repeat,
+    radial-gradient(circle var(--perf-r) at 0 50%, var(--_hole)) top left / 100%
+      var(--perf-p) no-repeat round,
     radial-gradient(circle var(--perf-r) at 100% 50%, var(--_hole)) top right /
       100% var(--perf-p) no-repeat round;
   mask-composite: intersect;
@@ -325,10 +329,18 @@ html[data-vt] *::after {
   .tuck > * {
     animation: var(--animate-tuck);
   }
-  .tuck > *:nth-child(1) { animation-delay: 0.06s; }
-  .tuck > *:nth-child(2) { animation-delay: 0.11s; }
-  .tuck > *:nth-child(3) { animation-delay: 0.16s; }
-  .tuck > *:nth-child(n + 4) { animation-delay: 0.21s; }
+  .tuck > *:nth-child(1) {
+    animation-delay: 0.06s;
+  }
+  .tuck > *:nth-child(2) {
+    animation-delay: 0.11s;
+  }
+  .tuck > *:nth-child(3) {
+    animation-delay: 0.16s;
+  }
+  .tuck > *:nth-child(n + 4) {
+    animation-delay: 0.21s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

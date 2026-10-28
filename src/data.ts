@@ -89,7 +89,10 @@ const content: Record<Lang, LocaleContent> = {
       },
       {
         name: "邮政单据",
-        articles: [{ title: "中国邮政单据列表" }, { title: "万国邮联信函单式列表" }],
+        articles: [
+          { title: "中国邮政单据列表" },
+          { title: "万国邮联信函单式列表" },
+        ],
       },
       {
         name: "法规标准",
@@ -97,9 +100,18 @@ const content: Record<Lang, LocaleContent> = {
           { title: "万国邮联S10标准" },
           { title: "万国邮联S9标准" },
           { title: "万国邮联S8标准" },
-          { title: "中国大陆《邮政业术语》标准", page: "《邮政业术语》标准变迁史" },
-          { title: "中国大陆《邮政普遍服务》标准", page: "《邮政普遍服务》标准变迁史" },
-          { title: "中国大陆《邮政日戳技术条件》标准", page: "《邮政日戳技术条件》标准变迁史" },
+          {
+            title: "中国大陆《邮政业术语》标准",
+            page: "《邮政业术语》标准变迁史",
+          },
+          {
+            title: "中国大陆《邮政普遍服务》标准",
+            page: "《邮政普遍服务》标准变迁史",
+          },
+          {
+            title: "中国大陆《邮政日戳技术条件》标准",
+            page: "《邮政日戳技术条件》标准变迁史",
+          },
           { title: "推荐性标准 (邮政领域)" },
           { title: "中国大陆现行邮政相关规章制度的目录列表" },
         ],
@@ -144,7 +156,8 @@ const content: Record<Lang, LocaleContent> = {
         name: "Rules & standards",
         articles: [
           {
-            title: "List of Currently Effective Postal-Related Rules and Regulations in P.R.C.",
+            title:
+              "List of Currently Effective Postal-Related Rules and Regulations in P.R.C.",
           },
           { title: "Terminology of postal industry" },
         ],
