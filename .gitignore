@@ -18,3 +18,7 @@ logs
 .env
 .env.*
 !.env.example
+.temp/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/review/

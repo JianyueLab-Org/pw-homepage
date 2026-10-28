@@ -16,14 +16,13 @@ const {
   description = "Search across the Chinese and English Postal Wikis — everything you want to know about postal.",
 } = Astro.props;
 
-// HTML lang attribute: BCP-47 form (zh-cn -> zh-CN).
-const htmlLang = lang === "zh-cn" ? "zh-CN" : "en";
+const htmlLang = (locales.find((l) => l.code === lang) ?? locales[0]).bcp47;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL("/logo.png", Astro.site).href;
 ---
 
 <!doctype html>
-<html lang={htmlLang} class="scroll-smooth">
+<html lang={htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -42,7 +41,7 @@ const ogImage = new URL("/logo.png", Astro.site).href;
       locales.map((l) => (
         <link
           rel="alternate"
-          hreflang={l.code === "zh-cn" ? "zh-CN" : "en"}
+          hreflang={l.bcp47}
           href={new URL(`/${l.code}/`, Astro.site).href}
         />
       ))

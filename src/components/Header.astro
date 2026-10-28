@@ -19,28 +19,32 @@ const items = [
 ];
 
 const linkBase =
-  "text-sm font-medium transition-colors hover:text-primary-600 dark:hover:text-primary-400";
+  "press focus-ring border-b-2 px-1 py-1 text-sm font-semibold hover:text-ink";
 ---
 
+<!-- Translucent chrome over the leaf. A rule appears under it only once there
+     is content scrolled behind it. -->
 <header
-  class="sticky top-0 z-40 border-b border-neutral-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/80"
+  id="site-header"
+  class="material sticky top-0 z-40 border-b border-transparent data-scrolled:border-rule"
 >
   <div
-    class="container mx-auto flex h-16 items-center justify-between gap-4 px-4"
+    class="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4"
   >
     <Logo lang={lang} />
 
     <!-- Desktop nav -->
-    <nav class="hidden items-center gap-6 md:flex">
+    <nav class="ml-auto hidden items-center gap-5 md:flex">
       {
         items.map((item) => (
           <a
             href={item.href}
+            aria-current={item.active ? "page" : undefined}
             class:list={[
               linkBase,
               item.active
-                ? "text-primary-600 dark:text-primary-400"
-                : "text-neutral-600 dark:text-neutral-300",
+                ? "border-vermilion text-ink"
+                : "border-transparent text-ink-2",
             ]}
             {...item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}}
           >
@@ -51,18 +55,20 @@ const linkBase =
     </nav>
 
     <div class="flex items-center gap-1">
-      <ThemeToggle />
+      <ThemeToggle lang={lang} />
 
-      <!-- Mobile menu button -->
+      <!-- Mobile menu button. The two icons cross along the same path in both
+           directions, so opening and closing read as one reversible motion. -->
       <button
         id="menu-toggle"
         type="button"
-        aria-label="Toggle navigation menu"
+        aria-label={t("menu.toggle")}
         aria-expanded="false"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 transition-colors hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800 md:hidden"
+        aria-controls="mobile-nav"
+        class="press focus-ring group relative inline-flex h-10 w-10 items-center justify-center text-ink-2 hover:bg-leaf-2 hover:text-ink md:hidden"
       >
         <svg
-          class="h-5 w-5"
+          class="absolute h-5 w-5 transition-[opacity,rotate,scale] duration-300 ease-standard group-aria-expanded:rotate-90 group-aria-expanded:scale-0 group-aria-expanded:opacity-0"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -74,39 +80,88 @@ const linkBase =
         >
           <path d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
+        <svg
+          class="absolute h-5 w-5 -rotate-90 scale-0 opacity-0 transition-[opacity,rotate,scale] duration-300 ease-standard group-aria-expanded:rotate-0 group-aria-expanded:scale-100 group-aria-expanded:opacity-100"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
       </button>
     </div>
   </div>
 
-  <!-- Mobile nav -->
-  <nav
+  <!-- Mobile nav. Floats out of the header rather than pushing the page down:
+       it animates on transform and opacity alone, so opening it costs no
+       layout. Opaque on purpose — a backdrop-filter nested inside the header's
+       own backdrop-filter samples an empty backdrop.
+       `inert` keeps the links out of reach while it is closed. -->
+  <div
     id="mobile-nav"
-    class="hidden border-t border-neutral-200 px-4 py-2 dark:border-neutral-800 md:hidden"
+    inert
+    class="absolute inset-x-0 top-full origin-top -translate-y-2 scale-y-95 border-b border-rule bg-leaf opacity-0 shadow-lg transition-[opacity,translate,scale] duration-250 ease-standard aria-hidden:pointer-events-none md:hidden"
+    aria-hidden="true"
   >
-    {
-      items.map((item) => (
-        <a
-          href={item.href}
-          class:list={[
-            "block rounded-md px-2 py-2 text-sm font-medium transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800",
-            item.active
-              ? "text-primary-600 dark:text-primary-400"
-              : "text-neutral-700 dark:text-neutral-200",
-          ]}
-          {...item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}}
-        >
-          {item.label}
-        </a>
-      ))
-    }
-  </nav>
+    <nav>
+      <div class="px-4 py-2">
+        {
+          items.map((item) => (
+            <a
+              href={item.href}
+              aria-current={item.active ? "page" : undefined}
+              class:list={[
+                "press focus-ring block px-2 py-2.5 text-sm font-semibold hover:bg-leaf-2",
+                item.active ? "text-ink" : "text-ink-2",
+              ]}
+              {...item.external ? { target: "_blank", rel: "noopener noreferrer" } : {}}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+  </div>
 </header>
 
 <script>
+  const header = document.getElementById("site-header");
   const btn = document.getElementById("menu-toggle");
   const nav = document.getElementById("mobile-nav");
+
   btn?.addEventListener("click", () => {
-    const open = nav?.classList.toggle("hidden") === false;
+    const open = btn.getAttribute("aria-expanded") !== "true";
     btn.setAttribute("aria-expanded", String(open));
+    if (nav) {
+      nav.classList.toggle("opacity-0", !open);
+      nav.classList.toggle("-translate-y-2", !open);
+      nav.classList.toggle("scale-y-95", !open);
+      nav.toggleAttribute("inert", !open);
+      nav.setAttribute("aria-hidden", String(!open));
+    }
   });
+
+  // Fade the scroll edge in as soon as content passes under the header.
+  // rAF-throttled and passive, so it never sits on the scroll path.
+  let ticking = false;
+  function syncScrolled() {
+    ticking = false;
+    header?.toggleAttribute("data-scrolled", window.scrollY > 4);
+  }
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(syncScrolled);
+    },
+    { passive: true },
+  );
+  syncScrolled();
 </script>

@@ -1,28 +1,73 @@
 ---
 import LocaleSwitcher from "./LocaleSwitcher.astro";
-import type { Lang } from "../i18n/ui";
+import { useTranslations, type Lang } from "../i18n/ui";
+import { contentForLang, pageUrl, qqGroup, supportEmail, wikiForLang } from "../data";
 
 interface Props {
   lang: Lang;
 }
 
 const { lang } = Astro.props;
+const t = useTranslations(lang);
+const wiki = wikiForLang(lang);
+const { pages } = contentForLang(lang);
 const year = new Date().getFullYear();
+const [licenseBefore, licenseAfter] = t("footer.license").split("{license}");
+
+const siteLinks = [
+  { label: t("footer.about"), href: pageUrl(wiki, pages.about) },
+  { label: t("footer.disclaimer"), href: pageUrl(wiki, pages.disclaimer) },
+  { label: t("footer.privacy"), href: pageUrl(wiki, pages.privacy) },
+];
 
 const iconBtn =
-  "inline-flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100";
+  "press focus-ring inline-flex h-10 w-10 items-center justify-center text-ink-2 hover:bg-leaf hover:text-ink";
+const textLink =
+  "focus-ring underline decoration-rule decoration-1 underline-offset-4 hover:text-ink hover:decoration-ink-2";
 ---
 
-<footer class="border-t border-neutral-200 dark:border-neutral-800">
-  <div
-    class="container mx-auto flex flex-col items-center gap-4 px-4 py-6 sm:flex-row sm:justify-between"
-  >
-    <div class="text-center sm:text-left">
-      <p class="text-sm text-neutral-500 dark:text-neutral-400">
-        Copyright © {year} JianyueLab Org. All Rights Reserved.
+<footer class="border-t border-rule bg-leaf-2 text-sm text-ink-2">
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    <div
+      class="flex flex-col items-center gap-3 border-b-2 border-dotted border-rule pb-5 text-center sm:flex-row sm:justify-between sm:text-left"
+    >
+      <nav aria-label={t("footer.nav")}>
+        <ul class="flex flex-wrap justify-center gap-x-5 gap-y-1">
+          {
+            siteLinks.map((link) => (
+              <li>
+                <a href={link.href} target="_blank" rel="noopener noreferrer" class={textLink}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <p class="flex flex-wrap justify-center gap-x-4 gap-y-1">
+        <span>
+          {t("footer.support")}
+          <a href={`mailto:${supportEmail}`} class:list={[textLink, "ml-1 text-ink"]}>{supportEmail}</a>
+        </span>
+        <span>
+          {t("footer.qq")} <span class="text-ink tabular-nums">{qqGroup}</span>
+        </span>
       </p>
-      <p class="text-sm text-neutral-500 dark:text-neutral-400">
-        Postal Wiki is registered trademark of Kyotsu Bussan Co., Ltd.
+    </div>
+
+  <div
+    class="mt-5 flex flex-col items-center gap-5 sm:flex-row sm:justify-between"
+  >
+    <div class="text-center text-balance sm:text-left">
+      <p>Copyright © {year} JianyueLab Org. All Rights Reserved.</p>
+      <p>Postal Wiki is a registered trademark of Kyotsu Bussan Co., Ltd.</p>
+      <p>
+        {licenseBefore}<a
+          href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+          target="_blank"
+          rel="noopener noreferrer license"
+          class={textLink}>CC BY-NC-SA 4.0</a
+        >{licenseAfter}
       </p>
     </div>
 
@@ -95,5 +140,6 @@ const iconBtn =
         </svg>
       </a>
     </div>
+  </div>
   </div>
 </footer>

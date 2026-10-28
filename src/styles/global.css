@@ -1,75 +1,297 @@
 @import "tailwindcss";
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource/noto-serif-sc/900.css";
 
 /* Class-based dark mode: toggled by adding `dark` to <html>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Semantic palette — primary = blue, surfaces driven by neutral.
-   Aliased so components can use `bg-primary-600`, `text-primary-500`, etc. */
-@theme {
-  --color-primary-50: var(--color-blue-50);
-  --color-primary-100: var(--color-blue-100);
-  --color-primary-200: var(--color-blue-200);
-  --color-primary-300: var(--color-blue-300);
-  --color-primary-400: var(--color-blue-400);
-  --color-primary-500: var(--color-blue-500);
-  --color-primary-600: var(--color-blue-600);
-  --color-primary-700: var(--color-blue-700);
-  --color-primary-800: var(--color-blue-800);
-  --color-primary-900: var(--color-blue-900);
-  --color-primary-950: var(--color-blue-950);
-
-  /* Entrance animations */
-  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-fade-in: fade-in 0.6s ease both;
-
-  @keyframes fade-up {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
+/* ---------------------------------------------------------------------------
+   Stock-book palette. Light is a pale album leaf; dark is the classic black
+   stock-book leaf. Stamp paper stays light in both, so anything printed on
+   paper uses `paper-ink`, and anything printed on the leaf uses `ink`.
+   --------------------------------------------------------------------------- */
 :root {
   color-scheme: light;
+  --leaf: #eceee7;
+  --leaf-2: #e2e5dc;
+  --rule: #c6cabd;
+  --ink: #1b1d19;
+  --ink-2: #565b51;
+  --paper: #fcfcf8;
+  --paper-ink: #1b1d19;
+  --paper-ink-2: #5b5f57;
+  --sheet: #213f8f;
+  --sheet-rule: #5d76b8;
+  --on-sheet: #f5f6fb;
+  --on-sheet-2: #c3cdeb;
+  --glassine: rgb(255 255 255 / 0.32);
+  --glassine-edge: rgb(255 255 255 / 0.95);
+  --focus: #1b1d19;
 }
 
 :root.dark {
   color-scheme: dark;
+  --leaf: #141512;
+  --leaf-2: #0e0f0d;
+  --rule: #2e302a;
+  --ink: #ecede6;
+  --ink-2: #a3a79b;
+  --paper: #ebeae2;
+  --sheet: #1c3477;
+  --sheet-rule: #4b63a6;
+  --glassine: rgb(255 255 255 / 0.07);
+  --glassine-edge: rgb(255 255 255 / 0.28);
+  --focus: #ecede6;
+}
+
+@theme {
+  --color-leaf: var(--leaf);
+  --color-leaf-2: var(--leaf-2);
+  --color-rule: var(--rule);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-paper: var(--paper);
+  --color-paper-ink: var(--paper-ink);
+  --color-paper-ink-2: var(--paper-ink-2);
+  --color-sheet: var(--sheet);
+  --color-sheet-rule: var(--sheet-rule);
+  --color-on-sheet: var(--on-sheet);
+  --color-on-sheet-2: var(--on-sheet-2);
+
+  /* The stamp set's inks. Printed on paper, so they hold in both themes. */
+  --color-vermilion: #c23b22;
+  --color-vermilion-deep: #a02f18;
+  --color-ultramarine: #25408f;
+  --color-postgreen: #2e6a3c;
+  --color-ochre: #94650f;
+  --color-cancel: #74776f;
+
+  --font-sans:
+    "Archivo Variable", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  /* Latin falls to Archivo, Han to Noto Serif SC: a stamp's two inscriptions. */
+  --font-display:
+    "Archivo Variable", "Noto Serif SC", "Songti SC", "SimSun", serif;
+
+  /* One curve for the whole site. It is a strong ease-out: things leave at
+     speed and settle, which is what both entering and exiting want. Exits use
+     this same curve, just over less time. */
+  --ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* The theme reveal drives a *radius*, and area grows as r², so it needs a
+     gentler curve than the UI one to avoid reading as a stall. */
+  --ease-reveal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Tracking is size-specific: large text tightens, small text opens. */
+  --text-xs--letter-spacing: 0.01em;
+  --text-sm--letter-spacing: 0.005em;
+  --text-base--letter-spacing: 0em;
+  --text-lg--letter-spacing: -0.005em;
+  --text-xl--letter-spacing: -0.01em;
+  --text-2xl--letter-spacing: -0.014em;
+  --text-3xl--letter-spacing: -0.018em;
+  --text-4xl--letter-spacing: -0.02em;
+  --text-4xl--line-height: 1.05;
+  --text-5xl--letter-spacing: -0.024em;
+  --text-5xl--line-height: 1;
+  --text-6xl--letter-spacing: -0.028em;
+  --text-6xl--line-height: 0.95;
+
+  /* The one entrance: a stamp slid down into its glassine pocket. */
+  --animate-tuck: tuck 0.42s var(--ease-standard) both;
+
+  @keyframes tuck {
+    from {
+      opacity: 0;
+      translate: 0 -16px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
+
+/* Tailwind emits a bare `:hover`, which a touchscreen fires on tap. Gate every
+   hover utility on the site behind a real pointer. */
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
 }
 
 html {
-  scroll-behavior: smooth;
+  font-optical-sizing: auto;
 }
 
 body {
-  @apply bg-white text-neutral-900 antialiased;
+  @apply bg-leaf font-sans text-ink antialiased;
 }
 
-.dark body {
-  @apply bg-neutral-950 text-neutral-100;
+::selection {
+  background-color: color-mix(
+    in oklab,
+    var(--color-vermilion) 28%,
+    transparent
+  );
+  color: inherit;
 }
 
-/* Smooth color crossfade between themes (fallback for browsers without the
-   View Transitions API; also smooths surfaces the circular reveal doesn't cover). */
+/* ---------------------------------------------------------------------------
+   Perforation. Four mask layers, one per edge, each a row of half-holes cut
+   into that edge; `round` fits a whole number of holes to any size, so the
+   edge never ends in a sliver. Intersected, they leave a solid stamp with
+   true holes the leaf shows through. Shadows go on a parent with
+   `drop-shadow`, which follows the holes; a box-shadow here would be masked.
+   --------------------------------------------------------------------------- */
+.perf {
+  --perf-r: 3.5px;
+  --perf-p: 12px;
+  --_hole: #0000 calc(100% - 0.5px), #000;
+  mask:
+    radial-gradient(circle var(--perf-r) at 50% 0, var(--_hole)) top left /
+      var(--perf-p) 100% round no-repeat,
+    radial-gradient(circle var(--perf-r) at 50% 100%, var(--_hole)) bottom
+      left / var(--perf-p) 100% round no-repeat,
+    radial-gradient(circle var(--perf-r) at 0 50%, var(--_hole)) top left / 100%
+      var(--perf-p) no-repeat round,
+    radial-gradient(circle var(--perf-r) at 100% 50%, var(--_hole)) top right /
+      100% var(--perf-p) no-repeat round;
+  mask-composite: intersect;
+}
+
+.perf-sm {
+  --perf-r: 2.5px;
+  --perf-p: 9px;
+}
+
+/* Lift for mounted paper. Two drops: a tight contact edge and a soft fall. */
+.mounted {
+  filter: drop-shadow(0 1px 0.5px rgb(0 0 0 / 0.16))
+    drop-shadow(0 6px 10px rgb(0 0 0 / 0.1));
+}
+
+.dark .mounted {
+  filter: drop-shadow(0 1px 0.5px rgb(0 0 0 / 0.6))
+    drop-shadow(0 8px 14px rgb(0 0 0 / 0.5));
+}
+
+/* Glassine pocket: the clear strip a stamp is tucked behind. It sits in front
+   of the stamp's lower edge and never takes a pointer. */
+.pocket {
+  position: relative;
+}
+
+.pocket::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset-inline: calc(var(--pocket-gap, 24px) / -2);
+  bottom: -10px;
+  /* Covers the issuer line only, so it never sits over a title. */
+  height: 3.5rem;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--glassine-edge) 0 1px,
+    var(--glassine) 1px
+  );
+  box-shadow: 0 -1px 0 rgb(0 0 0 / 0.06);
+}
+
+/* Cancellation. The postmark is always drawn, in the stamp's own paper colour,
+   so it cannot be seen; a visited link re-inks it. `:visited` may only change
+   colour, and takes its alpha from the unvisited value, so the unvisited ink
+   must be an opaque colour rather than transparent. */
+.postmark {
+  color: var(--paper);
+}
+
+a:visited .postmark {
+  color: var(--color-cancel);
+}
+
+/* Translucent chrome that content scrolls underneath. */
+.material {
+  background-color: color-mix(in oklab, var(--leaf) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .material {
+    background-color: var(--leaf);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink-2: var(--ink);
+    --paper-ink-2: var(--paper-ink);
+    --on-sheet-2: var(--on-sheet);
+    --glassine: transparent;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Press feedback — lands on pointer-down, faster in (90ms) than out (160ms).
+   Reduced motion keeps the colour response and drops the movement.
+   --------------------------------------------------------------------------- */
+.press {
+  transition:
+    scale 160ms var(--ease-standard),
+    translate 160ms var(--ease-standard),
+    opacity 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    filter 200ms var(--ease-standard);
+}
+
+.press:active {
+  scale: 0.97;
+  transition-duration: 90ms;
+}
+
+.press:disabled:active {
+  scale: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press {
+    transition:
+      opacity 150ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .press:active {
+    scale: 1;
+  }
+}
+
+/* Focus is a line of perforations, not a colour: the same dotted edge on
+   every control, inked to read on whatever it sits on. */
+.focus-ring:focus-visible {
+  outline: 2.5px dotted var(--focus);
+  outline-offset: 3px;
+}
+
+/* On the ultramarine sheet the perforation is white. */
+.on-sheet {
+  --focus: var(--on-sheet);
+}
+
+/* Colour crossfade between themes, for browsers with no View Transitions. */
 @media (prefers-reduced-motion: no-preference) {
   body,
   header,
-  footer,
-  .theme-surface {
+  footer {
     transition:
       background-color 0.4s ease,
       border-color 0.4s ease,
@@ -77,14 +299,24 @@ body {
   }
 }
 
-/* Theme switch: circular reveal driven by ThemeToggle.astro.
-   Disable the default cross-fade so our clip-path animation is the only effect. */
+/* While the theme reveal runs, every per-element transition is redundant: the
+   view transition already crossfades the whole document. */
+html[data-vt] *,
+html[data-vt] *::before,
+html[data-vt] *::after {
+  transition: none !important;
+}
+
+::view-transition-group(root) {
+  animation-duration: 420ms;
+}
+
+/* Theme switch: circular reveal driven by ThemeToggle.astro. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
-/* Keep the incoming (new theme) layer on top so the reveal expands over the old one. */
 ::view-transition-new(root) {
   z-index: 1;
 }
@@ -92,32 +324,26 @@ body {
   z-index: 0;
 }
 
-/* Staggered entrance helpers — apply with .reveal + .reveal-{n}. */
+/* Entrance: stamps tuck into the strip one after another, 50ms apart. */
 @media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    animation: var(--animate-fade-up);
+  .tuck > * {
+    animation: var(--animate-tuck);
   }
-  .reveal-1 {
-    animation-delay: 0.05s;
+  .tuck > *:nth-child(1) {
+    animation-delay: 0.06s;
   }
-  .reveal-2 {
-    animation-delay: 0.15s;
+  .tuck > *:nth-child(2) {
+    animation-delay: 0.11s;
   }
-  .reveal-3 {
-    animation-delay: 0.25s;
+  .tuck > *:nth-child(3) {
+    animation-delay: 0.16s;
   }
-  .reveal-4 {
-    animation-delay: 0.35s;
-  }
-  .reveal-5 {
-    animation-delay: 0.45s;
+  .tuck > *:nth-child(n + 4) {
+    animation-delay: 0.21s;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   ::view-transition-group(*),
   ::view-transition-old(root),
   ::view-transition-new(root) {

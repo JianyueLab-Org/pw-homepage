@@ -1,6 +1,6 @@
 ---
 import { useTranslations, type Lang } from "../i18n/ui";
-import { zhWiki, enWiki } from "../data";
+import { wikiForLang } from "../data";
 
 interface Props {
   lang: Lang;
@@ -11,63 +11,85 @@ const t = useTranslations(lang);
 
 // The search target follows the page locale: Chinese page -> Chinese wiki,
 // English page -> English wiki.
-const wiki = lang === "zh-cn" ? zhWiki : enWiki;
+const wiki = wikiForLang(lang);
+const host = new URL(wiki.url).host;
 ---
 
-<div
-  class="theme-surface rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-900"
->
-  <form id="search-form" class="flex gap-2" data-search-url={wiki.url}>
-    <input
-      id="search-input"
-      type="text"
-      autofocus
-      placeholder={t("home.placeholder")}
-      class="flex-1 rounded-md border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 transition-all duration-200 placeholder:text-neutral-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 focus:outline-none dark:border-neutral-700 dark:bg-neutral-950 dark:text-neutral-100"
-    />
-    <button
-      id="search-submit"
-      type="submit"
-      disabled
-      aria-label="Search"
-      class="inline-flex items-center justify-center rounded-md bg-primary-600 px-4 py-3 text-white transition-all duration-200 hover:bg-primary-700 hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+<!-- The search stamp: perforated paper mounted on the sheet. Its frame line
+     takes the vermilion ink while you are typing in it. -->
+<div class="mounted">
+  <div class="perf bg-paper p-3 text-paper-ink sm:p-3.5">
+    <div
+      class="group/stamp border-[1.5px] border-ultramarine/70 px-3 pt-3 pb-3 transition-colors duration-200 focus-within:border-vermilion sm:px-5 sm:pt-4 sm:pb-4"
     >
-      <svg
-        class="h-5 w-5"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="8"></circle>
-        <path d="m21 21-4.3-4.3"></path>
-      </svg>
-    </button>
-  </form>
+      <!-- A plain GET form to MediaWiki's search endpoint: it works before,
+           and without, JavaScript. The script below only refines the button. -->
+      <form method="get" action={`${wiki.url}/index.php`} role="search">
+        <input type="hidden" name="title" value="Special:Search" />
+        <input type="hidden" name="fulltext" value="1" />
+
+        <div class="mb-2.5 flex items-baseline justify-between gap-4 text-xs">
+          <label
+            for="search-input"
+            class="font-semibold uppercase tracking-[0.12em] text-ultramarine [font-stretch:85%]"
+          >
+            {t("search.label")}
+          </label>
+          <span class="truncate text-paper-ink-2">
+            {t("search.target")} <span class="tabular-nums text-paper-ink">{host}</span>
+          </span>
+        </div>
+
+        <div class="flex gap-2">
+          <input
+            id="search-input"
+            name="search"
+            type="search"
+            autocomplete="off"
+            placeholder={t("home.placeholder")}
+            class="min-w-0 flex-1 rounded-none border-[1.5px] border-paper-ink/80 bg-white px-3.5 py-3 text-base text-paper-ink caret-vermilion transition-[border-color,box-shadow] duration-200 ease-standard placeholder:text-paper-ink-2 focus:border-paper-ink focus:shadow-[inset_0_0_0_1px_var(--color-paper-ink)] focus:outline-none sm:px-4 sm:text-lg"
+          />
+          <button
+            id="search-submit"
+            type="submit"
+            class="press inline-flex shrink-0 items-center justify-center gap-2 bg-vermilion px-4 py-3 font-semibold text-white outline-offset-3 hover:bg-vermilion-deep focus-visible:outline-[2.5px] focus-visible:outline-paper-ink focus-visible:outline-dotted disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-vermilion sm:px-5"
+          >
+            <svg
+              class="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.25"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <circle cx="10.5" cy="10.5" r="6.5"></circle>
+              <path d="m15.5 15.5 5 5"></path>
+            </svg>
+            <span class="sr-only sm:not-sr-only">{t("search.submit")}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script>
-  const form = document.getElementById("search-form") as HTMLFormElement | null;
   const input = document.getElementById("search-input") as HTMLInputElement | null;
   const submit = document.getElementById("search-submit") as HTMLButtonElement | null;
 
+  // Focus the field on devices with a precise pointer. On touch, autofocus
+  // throws up the keyboard before the visitor has chosen to search.
+  if (input && window.matchMedia("(pointer: fine)").matches) {
+    input.focus({ preventScroll: true });
+  }
+
+  // Rendered enabled so the form still submits with JS off; JS takes over the
+  // empty-query state from here.
   function syncSubmit() {
     if (submit && input) submit.disabled = input.value.trim().length === 0;
   }
   input?.addEventListener("input", syncSubmit);
   syncSubmit();
-
-  form?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const query = input?.value.trim();
-    const base = form.dataset.searchUrl;
-    if (!query || !base) return;
-    window.location.href = `${base}/index.php?search=${encodeURIComponent(
-      query,
-    )}&title=Special:Search&fulltext=1`;
-  });
 </script>

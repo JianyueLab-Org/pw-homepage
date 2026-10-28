@@ -1,6 +1,6 @@
 ---
 import { useTranslations, type Lang } from "../i18n/ui";
-import { articlesForLang } from "../data";
+import { contentForLang, pageUrl, wikiForLang } from "../data";
 
 interface Props {
   lang: Lang;
@@ -8,37 +8,112 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const articles = articlesForLang(lang);
+const wiki = wikiForLang(lang);
+const { sets } = contentForLang(lang);
+
+// One ink per set, in issue order, the way a stamp issue shares one design.
+const inks = [
+  { band: "bg-vermilion", frame: "border-vermilion/60", text: "text-vermilion" },
+  { band: "bg-ultramarine", frame: "border-ultramarine/60", text: "text-ultramarine" },
+  { band: "bg-postgreen", frame: "border-postgreen/60", text: "text-postgreen" },
+  { band: "bg-ochre", frame: "border-ochre/60", text: "text-ochre" },
+];
 ---
 
-<section class="mt-8">
-  <h2 class="mb-4 text-lg font-semibold">{t("recommended.title")}</h2>
-  <div class="space-y-2">
-    {
-      articles.map((article) => (
-        <a
-          href={article.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="group flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-neutral-700 transition-all duration-200 hover:translate-x-1 hover:bg-neutral-100 hover:text-primary-700 dark:text-neutral-200 dark:hover:bg-neutral-800 dark:hover:text-primary-300"
-        >
-          <svg
-            class="h-5 w-5 shrink-0 text-neutral-400 transition-colors duration-200 group-hover:text-primary-500"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-          </svg>
-          <span>{article.title}</span>
-        </a>
-      ))
-    }
-  </div>
+<section class="mt-14 sm:mt-16" aria-labelledby="recommended-title">
+  <h2
+    id="recommended-title"
+    class="border-b border-rule pb-3 font-display text-2xl font-extrabold [font-stretch:80%]"
+  >
+    {t("recommended.title")}
+  </h2>
+
+  {
+    sets.map((set, s) => {
+      const ink = inks[s % inks.length];
+      const issue = String(s + 1).padStart(2, "0");
+      const count = set.articles.length;
+      return (
+        <section class="mt-8" aria-labelledby={`set-${issue}`}>
+          <div class="mb-4 flex items-baseline gap-3">
+            <span class:list={["text-xs font-bold tabular-nums [font-stretch:85%]", ink.text]}>
+              {issue}
+            </span>
+            <h3 id={`set-${issue}`} class="text-base font-bold">
+              {set.name}
+            </h3>
+            <span class="text-xs text-ink-2">{t("set.count").replace("{n}", String(count))}</span>
+          </div>
+
+          <!-- One stock-book strip per set: stamps tucked behind glassine. -->
+          <ul class="tuck grid grid-cols-2 gap-4 pb-3 [--pocket-gap:1rem] sm:gap-6 sm:[--pocket-gap:1.5rem] lg:grid-cols-4">
+            {set.articles.map((article, i) => {
+              // Chinese stamp numbering: issue, then (count-position).
+              const number = `${issue} (${count}-${i + 1})`;
+              return (
+                <li class="pocket">
+                  <a
+                    href={pageUrl(wiki, article.page ?? article.title)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mounted press focus-ring block h-full motion-safe:hover:-translate-y-1.5"
+                  >
+                    <div class="perf flex h-full flex-col bg-paper p-2.5 text-paper-ink">
+                      <div class:list={["relative flex h-full flex-col border-[1.5px]", ink.frame]}>
+                        <div
+                          class:list={[
+                            "flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-white tabular-nums [font-stretch:85%]",
+                            ink.band,
+                          ]}
+                        >
+                          <span>{number}</span>
+                          <span class="hidden truncate pl-2 sm:inline">{set.name}</span>
+                        </div>
+
+                        <!-- Inked only once the article has been opened. -->
+                        <svg
+                          class="postmark pointer-events-none absolute right-1 bottom-1.5 h-14 w-24"
+                          viewBox="0 0 112 64"
+                          fill="none"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <circle cx="80" cy="32" r="28" stroke-width="1.75" />
+                          <circle cx="80" cy="32" r="20" stroke-width="1" />
+                          <path d="M64 28h32M64 36h32" stroke-width="1.5" />
+                          <text
+                            x="80"
+                            y="34.5"
+                            fill="currentColor"
+                            stroke="none"
+                            font-size="7"
+                            font-weight="700"
+                            text-anchor="middle"
+                          >
+                            {number}
+                          </text>
+                          <path
+                            d="M0 18c6-4 12 4 18 0s12-4 18 0 12 4 16 1M0 32c6-4 12 4 18 0s12-4 18 0 12 4 16 0M0 46c6-4 12 4 18 0s12-4 18 0 12 4 16-1"
+                            stroke-width="1.75"
+                          />
+                        </svg>
+
+                        <p class="relative flex-1 px-3 pt-3 pb-6 text-[0.95rem] leading-snug font-semibold text-pretty">
+                          {article.title}
+                        </p>
+
+                        <p class="relative overflow-hidden px-3 pb-2 text-[0.625rem] font-semibold whitespace-nowrap text-paper-ink-2 uppercase tracking-[0.04em] [font-stretch:80%] sm:tracking-[0.16em] sm:[font-stretch:85%]">
+                          <span lang="zh-CN">邮政百科</span> · Postal Wiki
+                        </p>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      );
+    })
+  }
 </section>
