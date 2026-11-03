@@ -1,0 +1,11 @@
+.git
+.github
+.astro
+.impeccable
+.temp
+.vscode
+dist
+node_modules
+deploy
+*.md
+*.textClipping
