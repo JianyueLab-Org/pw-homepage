@@ -36,7 +36,8 @@ Postal systems worldwide, with the strongest coverage of mainland China, written
 
 ## Capabilities and Constraints
 
-- Static Astro site with Tailwind CSS v4; deployed as static files.
+- Astro site with Tailwind CSS v4. Locale pages are prerendered; the standalone Node adapter serves them and `/.well-known/device-bound-sessions`.
+- Runs on the jyl-tyo Kubernetes cluster (namespace `pw-homepage`).
 - Recommended articles, notices and site links live per locale in `src/data.ts`; there is no live data.
 - Inferred from the incumbent code, not confirmed: search is the primary action on the page.
 

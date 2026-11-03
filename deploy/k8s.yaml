@@ -1,0 +1,132 @@
+# postal.wiki homepage on jyl-tyo.
+# Applied by .github/workflows/deploy.yml; CI then sets the image to the commit SHA.
+# Ingress uses the cloudflare-tunnel class: the controller creates the DNS
+# records and TLS terminates at Cloudflare, so there is no tls: block.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pw-homepage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: pw-homepage
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: pw-homepage
+  template:
+    metadata:
+      labels:
+        app: pw-homepage
+    spec:
+      automountServiceAccountToken: false
+      # Nodes carry no zone label; spread by host.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: pw-homepage
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: app
+          image: ghcr.io/jianyuelab-org/pw-homepage:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 4321
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "10"]
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4321
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4321
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: app
+  namespace: pw-homepage
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pw-homepage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: pw-homepage
+spec:
+  selector:
+    app: pw-homepage
+  ports:
+    - port: 80
+      targetPort: 4321
+---
+# www.postal.wiki is redirected to postal.wiki by a Cloudflare redirect rule;
+# it is listed here so the controller keeps its DNS record on the tunnel.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pw-homepage
+  namespace: pw-homepage
+spec:
+  ingressClassName: cloudflare-tunnel
+  rules:
+    - host: postal.wiki
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app
+                port:
+                  number: 80
+    - host: www.postal.wiki
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app
+                port:
+                  number: 80
