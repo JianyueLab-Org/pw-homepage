@@ -37,8 +37,6 @@ spec:
           labelSelector:
             matchLabels:
               app: pw-homepage
-      imagePullSecrets:
-        - name: ghcr-pull
       containers:
         - name: app
           image: ghcr.io/jianyuelab-org/pw-homepage:latest
